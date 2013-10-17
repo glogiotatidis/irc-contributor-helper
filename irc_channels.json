@@ -1,0 +1,10 @@
+{
+  "#commtools": {
+    "product": "Community Tools",
+    "component": "Phonebook"
+  },
+  "#remo-dev": {
+    "product": "Mozilla Reps",
+    "component": "reps.mozilla.org"
+  }
+}
