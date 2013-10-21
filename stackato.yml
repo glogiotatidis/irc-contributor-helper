@@ -8,5 +8,6 @@ processes:
   web: node app.js
 ignores:
   - .git
-  - local.json*
   - venv
+  - node_modules
+  - local.json

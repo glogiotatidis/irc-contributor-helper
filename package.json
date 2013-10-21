@@ -1,6 +1,6 @@
 {
     "name": "irc-contributor-helper",
-    "description": "",
+    "description": "A bot to help contributors find mentored bugs.",
     "version": "0.0.1",
     "private": true,
     "maintainers": [
@@ -16,8 +16,9 @@
         }
     ],
     "dependencies": {
-        "irc": "~0.3.6",
-        "nconf": "~0.6.7",
-        "bz": "0.2.5"
+        "irc": "0.3.6",
+        "nconf": "0.6.7",
+        "bz": "0.2.5",
+        "express": "3.4.2"
     }
 }
