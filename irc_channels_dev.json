@@ -1,7 +1,8 @@
 {
   "#commtools1": {
     "product": "Community Tools",
-    "component": "Phonebook"
+    "component": "Phonebook",
+    "documentationMessage": " To find the documentation for the installation of mozillians, you can visit http://mozillians.rtfd.org"
   },
   "#remo-dev1": {
     "product": "Mozilla Reps",

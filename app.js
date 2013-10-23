@@ -67,6 +67,16 @@ ircClient.on('message', function(user, channel, message) {
     }
 });
 
+ircClient.on('message', function(user, channel, message) {
+    var command = message.split(' ')[0];
+    if (command === '!doc') {
+        var userMentioned = message.split(' ')[1];
+        var message = ((userMentioned || user) + (ircChannels[channel].documentationMessage ||
+                       ' to find the documentation for web dev projects you can visit '+
+                       'https://wiki.mozilla.org/Webdev/GetInvolved'));
+        ircClient.say(channel, message);
+    } 
+});
 
 /// Express
 app.use(express.bodyParser());
