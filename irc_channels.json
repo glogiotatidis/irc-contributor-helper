@@ -2,10 +2,11 @@
   "#commtools": {
     "product": "Community Tools",
     "component": "Phonebook",
-    "documentationMessage": " To find the documentation for the installation of mozillians, you can visit http://mozillians.rtfd.org"
+    "documentationMessage": ", you can find documentation for Mozillians at http://mozillians.rtfd.org"
   },
   "#remo-dev": {
     "product": "Mozilla Reps",
-    "component": "reps.mozilla.org"
+    "component": "reps.mozilla.org",
+    "documentationMessage": ", you can find documentation for Reps Portal at http://remo.rtfd.org"
   }
 }
