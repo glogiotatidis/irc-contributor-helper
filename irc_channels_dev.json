@@ -7,5 +7,10 @@
   "#remo-dev1": {
     "product": "Mozilla Reps",
     "component": "reps.mozilla.org"
-  }
+  },
+  "#webprod-dev": {
+    "product": "www.mozilla.org",
+    "component": "",
+    "documentationMessage": " To find the documentation for the installation of bedrock, you can visit http://bedrock.rtfd.org"    
+  }    
 }

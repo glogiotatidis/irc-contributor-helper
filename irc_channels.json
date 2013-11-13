@@ -8,5 +8,10 @@
     "product": "Mozilla Reps",
     "component": "reps.mozilla.org",
     "documentationMessage": ", you can find documentation for Reps Portal at http://remo.rtfd.org"
-  }
+  },
+  "#webprod": {
+    "product": "www.mozilla.org",
+    "component": "",
+    "documentationMessage": " To find the documentation for the installation of bedrock, you can visit http://bedrock.rtfd.org"    
+  }   
 }
