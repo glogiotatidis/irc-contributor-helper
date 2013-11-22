@@ -3,8 +3,6 @@
 var IRC = require('irc');
 var bz = require('bz');
 var nconf = require('nconf');
-var express = require('express');
-var app = express();
 
 nconf.file({ file: './local.json'}).defaults({
     PORT: 3000,
@@ -75,19 +73,5 @@ ircClient.on('message', function(user, channel, message) {
                        ' to find the documentation for web dev projects you can visit '+
                        'https://wiki.mozilla.org/Webdev/GetInvolved'));
         ircClient.say(channel, message);
-    } 
+    }
 });
-
-/// Express
-app.use(express.bodyParser());
-var data = 'Empty';
-
-app.get('/', function (request, response) {
-    response.send(data);
-});
-
-
-if (!module.parent) {
-    app.listen(config.PORT);
-    console.log('Express server listening on port ' + config.PORT);
-}

@@ -5,7 +5,9 @@ mem: 36M
 min_version:
   client: 1.4.3
 processes:
-  web: node app.js
+  web: ~
+command:
+  node app.js
 ignores:
   - .git
   - venv
