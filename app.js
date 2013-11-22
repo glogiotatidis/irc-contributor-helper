@@ -50,7 +50,7 @@ function fetchBugs(channel, product, component) {
 
 // via https://github.com/mythmon/standup-irc/blob/master/standup-irc.js
 // Connected to IRC server
-ircClient.on('registrered', function(message) {
+ircClient.on('registered', function(message) {
     console.log('Connected to IRC server.');
     // Store the nickname assigned by the server
     config.realNick = message.args[0];
@@ -58,20 +58,63 @@ ircClient.on('registrered', function(message) {
 });
 
 
+
 ircClient.on('message', function(user, channel, message) {
     if (message === '!bug') {
-        ircClient.say(channel, 'Looking for bugs...');
-        fetchBugs(channel, ircChannels[channel].product, ircChannels[channel].component);
+        var msg = (', ! commands are deprecated. Directly speak to me for help. ' +
+                   'Example: \n' + config.realNick + ', bugs');
+        ircClient.say(channel, msg);
     }
 });
 
+function showHelp(user, channel, cmd) {
+    var helpMessage = ('Here is a list of supported commands:\n' +
+                       ' - help: This message\n' +
+                       ' - docs [project]: Documentation for project\n' +
+                       ' - bugs [project]: Mentored bugs for project\n');
+    say(user, user, helpMessage);
+}
+
+function showDocs(user, channel, cmd) {
+    // TODO if channel not in ircChannels
+    say(channel, user, ircChannels[channel].documentationMessage);
+}
+
+function say(destination, user, message) {
+    var message = user + ', ' + message;
+    ircClient.say(destination, message);
+}
+
 ircClient.on('message', function(user, channel, message) {
-    var command = message.split(' ')[0];
-    if (command === '!doc') {
-        var userMentioned = message.split(' ')[1];
-        var message = ((userMentioned || user) + (ircChannels[channel].documentationMessage ||
-                       ' to find the documentation for web dev projects you can visit '+
-                       'https://wiki.mozilla.org/Webdev/GetInvolved'));
-        ircClient.say(channel, message);
+    var cmdRe = new RegExp('^' + config.realNick + '[:,]? +(.*)$', 'i');
+    var match = cmdRe.exec(message);
+    if (match) {
+        var cmd = match[1].trim();
+        switch (cmd) {
+          case 'ping':
+            say(channel, user, 'yo!');
+            break;
+          case 'sup?':
+            say(channel, user,  'just chilling, you?');
+            break;
+          case 'bugs':
+            fetchBugs2(user, channel, cmd);
+            break;
+          case 'documentation':
+          case 'doc':
+          case 'docs':
+            showDocs(user, channel, cmd);
+            break;
+          case 'help':
+            showHelp(user, channel, cmd);
+            break;
+          default:
+            say(channel, user, 'wat?');
+        }
     }
 });
+
+
+function fetchBugs2(user, channel, command) {
+
+};
