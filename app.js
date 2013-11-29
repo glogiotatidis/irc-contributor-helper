@@ -11,6 +11,7 @@ nconf.file({ file: './local.json'}).defaults({
 }).argv().env();
 
 var config = nconf.get();
+var registeredCommands = new Array();
 
 var ircChannels = require('./irc_channels.json');
 if ( config.dev ) {
@@ -32,21 +33,19 @@ var bzClient = bz.createClient({
 });
 
 
-function fetchBugs(channel, product, component) {
-    var searchTerms = {'status_whiteboard': 'mentor',
-                       'whiteboard_type': 'contains_all',
-                       'product': product,
-                       'component': component,
-                       'bug_status': 'NEW'};
+var Command = (function(cmdRe, execute) {
+    this.cmdRe = cmdRe;
+    this.execute = execute;
+    registeredCommands.push(this);
+});
 
-    bzClient.searchBugs(searchTerms, function   (errors, bugs) {
-        var bug, index;
-        for (index in bugs) {
-            bug = bugs[index];
-            ircClient.say(channel, 'bug ' + bug.id);
-        }
-    });
-}
+Command.prototype.match = function(message) {
+    if (this.cmdRe.exec(message)) {
+        return true;
+    }
+    return false;
+};
+
 
 // via https://github.com/mythmon/standup-irc/blob/master/standup-irc.js
 // Connected to IRC server
@@ -58,27 +57,57 @@ ircClient.on('registered', function(message) {
 });
 
 
-
-ircClient.on('message', function(user, channel, message) {
-    if (message === '!bug') {
-        var msg = (', ! commands are deprecated. Directly speak to me for help. ' +
-                   'Example: \n' + config.realNick + ', bugs');
-        ircClient.say(channel, msg);
+var showHelp = new Command(
+    new RegExp('^help', 'i'),
+    function(user, channel, cmd) {
+        var helpMessage = ('Here is a list of supported commands:\n' +
+                           ' - help: This message\n' +
+                           ' - docs [project]: Documentation for project\n' +
+                           ' - bugs [project]: Mentored bugs for project\n');
+        say(user, user, helpMessage);
     }
-});
+);
 
-function showHelp(user, channel, cmd) {
-    var helpMessage = ('Here is a list of supported commands:\n' +
-                       ' - help: This message\n' +
-                       ' - docs [project]: Documentation for project\n' +
-                       ' - bugs [project]: Mentored bugs for project\n');
-    say(user, user, helpMessage);
-}
+var showDocs = new Command(
+    new RegExp('^(documentation|docs|doc)', 'i'),
+    function(user, channel, cmd) {
+        say(channel, user, ircChannels[channel].documentationMessage);
+    }
+);
 
-function showDocs(user, channel, cmd) {
-    // TODO if channel not in ircChannels
-    say(channel, user, ircChannels[channel].documentationMessage);
-}
+var Ping = new Command(
+    new RegExp('^ping', 'i'),
+    function (user, channel, cmd) {
+        say(channel, user, 'pong');
+    }
+);
+
+var Sup = new Command(
+    new RegExp('^sup', 'i'),
+    function(user, channel, cmd) {
+        say(channel, user, 'just chilling, you?');
+    }
+);
+
+var fetchBugs = new Command(
+    new RegExp('^bugs?', 'i'),
+    function(user, channel, cmd) {
+
+        var searchTerms = {'status_whiteboard': 'mentor',
+                           'whiteboard_type': 'contains_all',
+                           'product': ircChannels[channel].product,
+                           'component': ircChannels[channel].component,
+                           'bug_status': 'NEW'};
+
+        bzClient.searchBugs(searchTerms, function (errors, bugs) {
+            var bug, index;
+            for (index in bugs) {
+                bug = bugs[index];
+                say(channel, user, 'bug ' + bug.id);
+            }
+        });
+    }
+);
 
 function say(destination, user, message) {
     var message = user + ', ' + message;
@@ -86,35 +115,17 @@ function say(destination, user, message) {
 }
 
 ircClient.on('message', function(user, channel, message) {
-    var cmdRe = new RegExp('^' + config.realNick + '[:,]? +(.*)$', 'i');
-    var match = cmdRe.exec(message);
-    if (match) {
-        var cmd = match[1].trim();
-        switch (cmd) {
-          case 'ping':
-            say(channel, user, 'yo!');
-            break;
-          case 'sup?':
-            say(channel, user,  'just chilling, you?');
-            break;
-          case 'bugs':
-            fetchBugs2(user, channel, cmd);
-            break;
-          case 'documentation':
-          case 'doc':
-          case 'docs':
-            showDocs(user, channel, cmd);
-            break;
-          case 'help':
-            showHelp(user, channel, cmd);
-            break;
-          default:
+    var regex = new RegExp('^' + config.realNick + '[:,]?');
+    var command = message.split(regex)[1].trim();
+
+    if (command) {
+        for (var i=0; i < registeredCommands.length; i++) {
+            if (registeredCommands[i].match(command)) {
+                registeredCommands[i].execute(user, channel, command);
+            }
+        }
+        if (i === registeredCommands.length + 1) {
             say(channel, user, 'wat?');
         }
     }
 });
-
-
-function fetchBugs2(user, channel, command) {
-
-};
