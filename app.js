@@ -139,10 +139,11 @@ ircClient.on('message', function(user, channel, message) {
         for (var i=0; i < registeredCommands.length; i++) {
             if (registeredCommands[i].match(command)) {
                 registeredCommands[i].execute(user, channel, command);
+                break;
             }
         }
-        if (i === registeredCommands.length + 1) {
-            say(channel, user, 'wat?');
+        if (i === registeredCommands.length) {
+            say(channel, user, 'hi! I\'m a ro- ro- robot! You can ask me for "help".');
         }
     }
 });
